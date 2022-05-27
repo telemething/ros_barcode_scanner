@@ -1,5 +1,5 @@
 
-#include "barcode_scan/scanner.hpp"
+#include "composition/scanner2.hpp"
 
 #include <functional>
 
@@ -8,35 +8,31 @@
 namespace barcode_scan
 {
 
-scanner::scanner(const NodeOptions& options)
-:   Node("scanner", options)
+scanner2::scanner2(const NodeOptions& options)
+:   Node("scanner2", options)
 {
     on_shutdown([&]
     {
-        scanner::shutdown_callback();
+        scanner2::shutdown_callback();
     });
+
+    // init time
+    period_ = rclcpp::Rate(msgs_per_sec_).period();
+    last_time_ = this->now();
 
     using std::placeholders::_1;
 
     m_image_sub = image_transport::create_subscription(this, "image_raw",
-        std::bind(&scanner::image_callback, this, _1),
+        std::bind(&scanner2::image_callback, this, _1),
         "raw", rmw_qos_profile_sensor_data);
 
     m_scan_result_pub = this->create_publisher<barcode_msgs::msg::ScanResult>("barcodes",
         QoS(10));
 }
 
-rclcpp::Time last_time_;
-std::chrono::nanoseconds period_;
-
-void scanner::image_callback(const sensor_msgs::msg::Image::ConstSharedPtr& image_msg)
+void scanner2::image_callback(const sensor_msgs::msg::Image::ConstSharedPtr& image_msg)
 {
     //****************************
-
-    // TODO : once at init
-    double msgs_per_sec_ = 1.0;
-    period_ = rclcpp::Rate(msgs_per_sec_).period();
-
     const auto & now = this->now();
 
     if (last_time_ > now) 
@@ -88,9 +84,9 @@ void scanner::image_callback(const sensor_msgs::msg::Image::ConstSharedPtr& imag
         scan_result_msg.header = image_msg->header;
         m_scan_result_pub->publish(scan_result_msg);
     }
-} // scanner::image_callback()
+} // scanner2::image_callback()
 
-void scanner::shutdown_callback()
+void scanner2::shutdown_callback()
 {
 
 }

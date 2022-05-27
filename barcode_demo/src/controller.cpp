@@ -16,9 +16,9 @@ controller::controller(const rclcpp::NodeOptions& options)
     m_marker_pub = this->create_publisher<image_draw_msgs::msg::ImageMarker>("image_markers",
         rclcpp::QoS(10));
 
-    m_scan_result_sub = this->create_subscription<barcode_msgs::msg::ScanResult>(
-        "barcodes", rclcpp::QoS(10),
-        std::bind(&controller::scan_result_callback, this, _1));  
+    //m_scan_result_sub = this->create_subscription<barcode_msgs::msg::ScanResult>(
+    //    "barcodes", rclcpp::QoS(10),
+    //    std::bind(&controller::scan_result_callback, this, _1));  
 }
 
 void controller::scan_result_callback(

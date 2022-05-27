@@ -63,4 +63,5 @@ def generate_launch_description():
         parameters=[camera_config]
     )
 
-    return launch.LaunchDescription([container, rqt_image_view_node, camera_node])
+    #return launch.LaunchDescription([container, rqt_image_view_node, camera_node])
+    return launch.LaunchDescription([container, camera_node])
