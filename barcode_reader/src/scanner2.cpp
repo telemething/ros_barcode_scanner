@@ -22,7 +22,7 @@ scanner2::scanner2(const NodeOptions& options)
 
     using std::placeholders::_1;
 
-    m_image_sub = image_transport::create_subscription(this, "image_raw",
+    m_image_sub = image_transport::create_subscription(this, "/image_raw",
         std::bind(&scanner2::image_callback, this, _1),
         "raw", rmw_qos_profile_sensor_data);
 

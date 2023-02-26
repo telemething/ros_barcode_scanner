@@ -14,10 +14,10 @@
 
 #include <memory>
 
-#include "composition/client_component.hpp"
-#include "composition/listener_component.hpp"
-#include "composition/talker_component.hpp"
-#include "composition/server_component.hpp"
+//#include "composition/client_component.hpp"
+//#include "composition/listener_component.hpp"
+//#include "composition/talker_component.hpp"
+//#include "composition/server_component.hpp"
 #include "composition/scanner2.hpp"
 #include "rclcpp/rclcpp.hpp"
 

@@ -18,10 +18,7 @@ def generate_launch_description():
         package='barcode_reader',
         namespace='',
         executable='scanner',
-        name='manual',
-        remappings=[
-            ('image_raw', 'webcam/image_raw')
-        ]   
+        name='manual'
     )
 
     rqt_image_view_node = Node(
@@ -42,4 +39,5 @@ def generate_launch_description():
     )
 
     #return launch.LaunchDescription([container, rqt_image_view_node, camera_node])
-    return launch.LaunchDescription([manual_node, camera_node])
+    #return launch.LaunchDescription([manual_node, camera_node])
+    return launch.LaunchDescription([manual_node])

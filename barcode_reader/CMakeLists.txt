@@ -32,61 +32,6 @@ pkg_check_modules(ZBar REQUIRED IMPORTED_TARGET zbar)
 # create ament index resource which references the libraries in the binary dir
 set(node_plugins "")
 
-add_library(talker_component SHARED
-  src/talker_component.cpp)
-target_compile_definitions(talker_component
-  PRIVATE "COMPOSITION_BUILDING_DLL")
-ament_target_dependencies(talker_component
-  "rclcpp"
-  "rclcpp_components"
-  "std_msgs")
-rclcpp_components_register_nodes(talker_component "composition::Talker")
-set(node_plugins "${node_plugins}composition::Talker;$<TARGET_FILE:talker_component>\n")
-
-add_library(listener_component SHARED
-  src/listener_component.cpp)
-target_compile_definitions(listener_component
-  PRIVATE "COMPOSITION_BUILDING_DLL")
-ament_target_dependencies(listener_component
-  "rclcpp"
-  "rclcpp_components"
-  "std_msgs")
-rclcpp_components_register_nodes(listener_component "composition::Listener")
-set(node_plugins "${node_plugins}composition::Listener;$<TARGET_FILE:listener_component>\n")
-
-add_library(node_like_listener_component SHARED
-  src/node_like_listener_component.cpp)
-target_compile_definitions(node_like_listener_component
-  PRIVATE "COMPOSITION_BUILDING_DLL")
-ament_target_dependencies(node_like_listener_component
-  "rclcpp"
-  "rclcpp_components"
-  "std_msgs")
-rclcpp_components_register_nodes(node_like_listener_component "composition::NodeLikeListener")
-set(node_plugins "${node_plugins}composition::NodeLikeListener;$<TARGET_FILE:node_like_listener_component>\n")
-
-add_library(server_component SHARED
-  src/server_component.cpp)
-target_compile_definitions(server_component
-  PRIVATE "COMPOSITION_BUILDING_DLL")
-ament_target_dependencies(server_component
-  "example_interfaces"
-  "rclcpp"
-  "rclcpp_components")
-rclcpp_components_register_nodes(server_component "composition::Server")
-set(node_plugins "${node_plugins}composition::Server;$<TARGET_FILE:server_component>\n")
-
-add_library(client_component SHARED
-  src/client_component.cpp)
-target_compile_definitions(client_component
-  PRIVATE "COMPOSITION_BUILDING_DLL")
-ament_target_dependencies(client_component
-  "example_interfaces"
-  "rclcpp"
-  "rclcpp_components")
-rclcpp_components_register_nodes(client_component "composition::Client")
-set(node_plugins "${node_plugins}composition::Client;$<TARGET_FILE:client_component>\n")
-
 add_library(scanner2 SHARED
   src/scanner2.cpp)
 target_compile_definitions(scanner2
@@ -104,7 +49,6 @@ ament_target_dependencies(scanner2
   barcode_msgs
   OpenCV)
 rclcpp_components_register_nodes(scanner2 "composition::Scanner2")
-set(node_plugins "${node_plugins}composition::Client;$<TARGET_FILE:client_component>\n")
 
 # since the package installs libraries without exporting them
 # it needs to make sure that the library path is being exported
@@ -116,10 +60,6 @@ endif()
 add_executable(scanner
   src/scanner.cpp)
 target_link_libraries(scanner
-  talker_component
-  listener_component
-  server_component
-  client_component
   scanner2)
 ament_target_dependencies(scanner
   rclcpp
@@ -129,13 +69,7 @@ ament_target_dependencies(scanner
   barcode_msgs
   OpenCV)
 
-add_executable(linktime_composition
-  src/linktime_composition.cpp)
 set(libs
-  talker_component
-  listener_component
-  server_component
-  client_component
   scanner2)
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   set(libs
@@ -143,34 +77,15 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     ${libs}
     "-Wl,--as-needed")
 endif()
-target_link_libraries(linktime_composition ${libs})
-ament_target_dependencies(linktime_composition
-  "class_loader"
-  "rclcpp"
-  "rclcpp_components")
-
-add_executable(dlopen_composition
-  src/dlopen_composition.cpp)
-ament_target_dependencies(dlopen_composition
-  "class_loader"
-  "rclcpp"
-  "rclcpp_components")
 
 install(TARGETS
-  talker_component
-  listener_component
-  node_like_listener_component
-  server_component
-  client_component
   scanner2
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
 
 install(TARGETS
-scanner
-  linktime_composition
-  dlopen_composition
+  scanner
   DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
@@ -189,21 +104,12 @@ if(BUILD_TESTING)
   set(generated_python_files)
   macro(tests)
     set(SCANNER_EXECUTABLE $<TARGET_FILE:scanner>)
-    set(LINKTIME_COMPOSITION_EXECUTABLE $<TARGET_FILE:linktime_composition>)
-    set(DLOPEN_COMPOSITION_EXECUTABLE $<TARGET_FILE:dlopen_composition>)
-    set(TALKER_LIBRARY $<TARGET_FILE:talker_component>)
-    set(LISTENER_LIBRARY $<TARGET_FILE:listener_component>)
-    set(SERVER_LIBRARY $<TARGET_FILE:server_component>)
-    set(CLIENT_LIBRARY $<TARGET_FILE:client_component>)    
     set(CLIENT_LIBRARY $<TARGET_FILE:scanner2>)
-    set(NODE_LIKE_LISTENER_LIBRARY $<TARGET_FILE:node_like_listener_component>)
     set(EXPECTED_OUTPUT_ALL "${CMAKE_CURRENT_SOURCE_DIR}/test/composition_all")
     set(EXPECTED_OUTPUT_PUBSUB "${CMAKE_CURRENT_SOURCE_DIR}/test/composition_pubsub")
     set(EXPECTED_OUTPUT_SRV "${CMAKE_CURRENT_SOURCE_DIR}/test/composition_srv")
 
     set(test_names
-      "test_dlopen_composition"
-      "test_linktime_composition"
       "test_scanner"
     )
     foreach(test_name IN LISTS test_names)
